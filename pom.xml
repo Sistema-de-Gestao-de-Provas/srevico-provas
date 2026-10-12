@@ -11,7 +11,6 @@
 	<groupId>com.sgp</groupId>
 	<artifactId>servico-provas</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
 	<description/>
 	<url/>
 	<licenses>
@@ -69,6 +68,12 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+                <dependency>
+                    <groupId>org.modelmapper</groupId>
+                    <artifactId>modelmapper</artifactId>
+                    <version>3.2.6</version>
+                    <scope>compile</scope>
+                </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator-test</artifactId>
