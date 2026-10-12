@@ -1,3 +1,27 @@
 spring:
   application:
     name: servico-provas
+  config:
+    import: optional:file:./.env[.properties]
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sgp
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      # Garante o schema do serviço antes do Liquibase e do Hibernate usarem a conexão.
+      connection-init-sql: CREATE SCHEMA IF NOT EXISTS ${spring.liquibase.default-schema}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${spring.liquibase.default-schema}
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: provas
+    # As tabelas de controle do Liquibase ficam no public, pois o schema do serviço
+    # ainda não existe quando o Liquibase inicia.
+    liquibase-schema: public
+    parameters:
+      schema: ${spring.liquibase.default-schema}

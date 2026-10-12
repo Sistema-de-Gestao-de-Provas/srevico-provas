@@ -1,0 +1,129 @@
+databaseChangeLog:
+  - changeSet:
+      id: v000-criar-tabela-prova
+      author: Diego Casemiro
+      changes:
+        - createTable:
+            schemaName: ${schema}
+            tableName: prova
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_prova
+              - column:
+                  name: usuario_keycloak_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: materia_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: titulo
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: descricao
+                  type: TEXT
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: criado_em
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: atualizado_em
+                  type: TIMESTAMP
+              - column:
+                  name: deletado_em
+                  type: TIMESTAMP
+        - sql:
+            sql: ALTER TABLE ${schema}.prova ADD CONSTRAINT ck_prova_status CHECK (status IN ('RASCUNHO', 'PUBLICADA'));
+        - createIndex:
+            schemaName: ${schema}
+            tableName: prova
+            indexName: idx_prova_usuario_keycloak_id
+            columns:
+              - column:
+                  name: usuario_keycloak_id
+        - createIndex:
+            schemaName: ${schema}
+            tableName: prova
+            indexName: idx_prova_materia_id
+            columns:
+              - column:
+                  name: materia_id
+      rollback:
+        - dropTable:
+            schemaName: ${schema}
+            tableName: prova
+
+  - changeSet:
+      id: v000-criar-tabela-prova-questao
+      author: Diego Casemiro
+      changes:
+        - createTable:
+            schemaName: ${schema}
+            tableName: prova_questao
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_prova_questao
+              - column:
+                  name: prova_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_prova_questao_prova
+                    referencedTableSchemaName: ${schema}
+                    referencedTableName: prova
+                    referencedColumnNames: id
+              - column:
+                  name: questao_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: criado_em
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: atualizado_em
+                  type: TIMESTAMP
+              - column:
+                  name: deletado_em
+                  type: TIMESTAMP
+        - createIndex:
+            schemaName: ${schema}
+            tableName: prova_questao
+            indexName: idx_prova_questao_prova_id
+            columns:
+              - column:
+                  name: prova_id
+        - createIndex:
+            schemaName: ${schema}
+            tableName: prova_questao
+            indexName: idx_prova_questao_questao_id
+            columns:
+              - column:
+                  name: questao_id
+      rollback:
+        - dropTable:
+            schemaName: ${schema}
+            tableName: prova_questao
