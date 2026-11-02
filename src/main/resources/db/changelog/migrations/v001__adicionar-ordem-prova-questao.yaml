@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: v001-adicionar-ordem-prova-questao
+      author: Diego Casemiro
+      changes:
+        - addColumn:
+            schemaName: ${schema}
+            tableName: prova_questao
+            columns:
+              - column:
+                  name: ordem
+                  type: INTEGER
+        # Provas que já existem mantêm a ordem em que as questões foram vinculadas
+        - sql:
+            sql: >
+              UPDATE ${schema}.prova_questao pq
+              SET ordem = numeradas.ordem
+              FROM (SELECT id, ROW_NUMBER() OVER (PARTITION BY prova_id ORDER BY id) - 1 AS ordem
+                    FROM ${schema}.prova_questao) numeradas
+              WHERE pq.id = numeradas.id;
+        - addNotNullConstraint:
+            schemaName: ${schema}
+            tableName: prova_questao
+            columnName: ordem
+            columnDataType: INTEGER
+      rollback:
+        - dropColumn:
+            schemaName: ${schema}
+            tableName: prova_questao
+            columnName: ordem
