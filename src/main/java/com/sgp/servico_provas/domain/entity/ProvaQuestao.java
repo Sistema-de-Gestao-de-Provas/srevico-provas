@@ -30,4 +30,8 @@ public class ProvaQuestao extends EntidadeBase {
 
     @Column(name = "questao_id", nullable = false)
     private Long questaoId;
+
+    // Posição da questão na prova, começando em 0
+    @Column(nullable = false)
+    private Integer ordem;
 }

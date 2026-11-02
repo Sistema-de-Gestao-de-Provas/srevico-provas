@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -44,5 +45,6 @@ public class Prova extends EntidadeBase {
     private Status status;
 
     @OneToMany(mappedBy = "prova", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("ordem ASC")
     private List<ProvaQuestao> questoes = new ArrayList<>();
 }

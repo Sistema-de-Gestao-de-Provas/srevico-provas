@@ -5,6 +5,7 @@ package com.sgp.servico_provas.domain.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -198,6 +199,19 @@ class ProvaServiceTest {
         assertThat(caminhosRecebidos)
                 .containsExactly("/api/v1/materias/1", "/api/v1/questoes/10", "/api/v1/questoes/11");
         assertThat(authorizationsRecebidos).containsOnly("Bearer " + TOKEN);
+    }
+
+    @Test
+    void criarDeveGravarAsQuestoesNaOrdemDoRequest() {
+        when(provaRepository.save(any(Prova.class))).thenAnswer(invocacao -> invocacao.getArgument(0));
+
+        ProvaResponse resultado = provaService.criar(request(1L, 11L, 10L), AUTOR);
+
+        ArgumentCaptor<Prova> salva = ArgumentCaptor.forClass(Prova.class);
+        verify(provaRepository).save(salva.capture());
+        assertThat(salva.getValue().getQuestoes()).extracting("questaoId", "ordem")
+                .containsExactly(tuple(11L, 0), tuple(10L, 1));
+        assertThat(resultado.getQuestoes()).extracting("questaoId").containsExactly(11L, 10L);
     }
 
     @Test
@@ -408,10 +422,11 @@ class ProvaServiceTest {
         prova.setTitulo("Prova de Cálculo I");
         prova.setDescricao("Primeira avaliação");
         prova.setStatus(status);
-        for (Long questaoId : questaoIds) {
+        for (int ordem = 0; ordem < questaoIds.length; ordem++) {
             ProvaQuestao provaQuestao = new ProvaQuestao();
             provaQuestao.setProva(prova);
-            provaQuestao.setQuestaoId(questaoId);
+            provaQuestao.setQuestaoId(questaoIds[ordem]);
+            provaQuestao.setOrdem(ordem);
             prova.getQuestoes().add(provaQuestao);
         }
         return prova;

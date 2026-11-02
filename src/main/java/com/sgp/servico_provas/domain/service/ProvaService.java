@@ -179,7 +179,8 @@ public class ProvaService {
                 });
     }
 
-    // As questões são sempre substituídas pelas do request: as antigas são apagadas (orphanRemoval)
+    // As questões são sempre substituídas pelas do request: as antigas são apagadas (orphanRemoval).
+    // A ordem da lista questaoIds é a ordem das questões na prova
     private void aplicarRequest(Prova prova, ProvaRequest request) {
         // Na atualização, só consulta o servico-usuarios se a matéria mudou
         if (!request.getMateriaId().equals(prova.getMateriaId())) {
@@ -191,12 +192,14 @@ public class ProvaService {
         prova.setDescricao(request.getDescricao());
 
         prova.getQuestoes().clear();
-        request.getQuestaoIds().forEach(questaoId -> {
+        List<Long> questaoIds = request.getQuestaoIds();
+        for (int ordem = 0; ordem < questaoIds.size(); ordem++) {
             ProvaQuestao provaQuestao = new ProvaQuestao();
             provaQuestao.setProva(prova);
-            provaQuestao.setQuestaoId(questaoId);
+            provaQuestao.setQuestaoId(questaoIds.get(ordem));
+            provaQuestao.setOrdem(ordem);
             prova.getQuestoes().add(provaQuestao);
-        });
+        }
     }
 
     // O servico-questoes já aplica a regra de autoria: quem não é o autor da questão (nem ADMIN) recebe 403
